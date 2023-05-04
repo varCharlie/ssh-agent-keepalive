@@ -5,7 +5,7 @@ declare bp=~/.bash_profile
 declare -r conf=~/.ssh/config
 
 cp $bp ${bp}~
-cat ssh-agent-keepalive >> $bp && echo '[!] Ran `cat ssh-agent-keepalive >> '${bp}'`'
+tail -n +2 ssh-agent-keepalive >> $bp && echo '[!] Ran `cat ssh-agent-keepalive >> '${bp}'`'
 
 prompt() {
     read -p '[?] Would you like to enable ForwardAgent in all instances? (y/n) ' ans
