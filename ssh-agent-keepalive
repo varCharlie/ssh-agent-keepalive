@@ -1,0 +1,110 @@
+# ============= BEGIN SSH-AGENT KEEPALIVE ====================================
+#
+# ███████╗███████╗██╗  ██╗       █████╗  ██████╗ ███████╗███╗   ██╗████████╗
+# ██╔════╝██╔════╝██║  ██║      ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝
+# ███████╗███████╗███████║█████╗███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║
+# ╚════██║╚════██║██╔══██║╚════╝██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║
+# ███████║███████║██║  ██║      ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║
+# ╚══════╝╚══════╝╚═╝  ╚═╝      ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝
+#
+# ██╗  ██╗███████╗███████╗██████╗  █████╗ ██╗     ██╗██╗   ██╗███████╗
+# ██║ ██╔╝██╔════╝██╔════╝██╔══██╗██╔══██╗██║     ██║██║   ██║██╔════╝
+# █████╔╝ █████╗  █████╗  ██████╔╝███████║██║     ██║██║   ██║█████╗
+# ██╔═██╗ ██╔══╝  ██╔══╝  ██╔═══╝ ██╔══██║██║     ██║╚██╗ ██╔╝██╔══╝
+# ██║  ██╗███████╗███████╗██║     ██║  ██║███████╗██║ ╚████╔╝ ███████╗
+# ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝  ╚══════╝
+#
+#
+#   Why use SSH-AGENT KEEPALIVE in your ~/.bash_profile?
+#    1. Because ssh-agent makes your life easier
+#    2. Many terminal emulators (terminal and iterm on MacOS) open a new
+#       login shell for each tab/window. Each login invokes ~/.bash_profile
+#	 3. Having a single ssh-agent running with a cached environment will allow
+#       you to use the same ssh-agent in all windows, tabs, tmux sessions, tmux
+#       windows, tmux panes etc...
+#
+#
+#   SSH-AGENT KEEPALIVE does the following:
+#     - caches your ssh-agent environment at ~/.ssh/env
+#           (set SSH_ENV to choose a different location)
+#     - kills any extra ssh-agent pids that exist for your user
+#     - re-attachs to your ssh-agent when you open a new login
+#
+#
+#   How to make the most of SSH-AGENT KEEPALIVE?
+#     - Add your keys to the bash array ${SSH_KEYS}
+#     - Configure SSH to forward your agent via ~/.ssh/config
+#       (`man 5 ssh-config` for more info on how to do that)
+#
+
+
+# (ex: declare -a SSH_KEYS=(id_rsa) if your key is at ~/.ssh/id_rsa)
+# Uncomment the following line and edit to add you SSH keys relative to ~/.ssh
+#declare -a SSH_KEYS=(id_rsa)
+declare SSH_ENV="$HOME/.ssh/env"
+declare pgrep="pgrep -u ${EUID}"
+declare pkill="pkill -u ${EUID}"
+declare pgrep_out=`$pgrep ssh-agent 2>/dev/null | tr '\n' ' '`
+
+
+function __agentdeath {
+    $pkill ssh-agent
+    >&2 echo '[X] Killed all ssh-agents...'
+    test -e ${SSH_ENV} && rm ${SSH_ENV}
+}
+
+function __same_agent {
+    if echo $pgrep_out | grep -qE "^${SSH_AGENT_PID}$"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function __start_agent {
+    >&2 echo "[+] Starting ssh agent..."
+    ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+    >&2 echo "[!] Saved ssh env at ${SSH_ENV}, agent pid ${SSH_AGENT_PID}"
+    chmod 600 "${SSH_ENV}"
+    source ${SSH_ENV}
+}
+
+function __kill_extra_agents {
+    for pid in `echo $pgrep_out`; do
+        if [ ${SSH_AGENT_PID} -ne ${pid} ]; then
+            kill -9 $pid && \
+            >&2 echo "[X] Killed stale ssh-agent with pid ${pid}"
+            pgrep_out=${pgrep_out/$pid/}
+        fi
+    done
+}
+
+function start_agent {
+    if [ "${pgrep_out:-x}" != "x" ]; then
+        >&2 echo "[!] Found running ssh-agent(s)..."
+        if test -s "${SSH_ENV}"; then
+            >&2 echo "[!] Found cached ssh-agent env, sourcing..."
+            source "${SSH_ENV}"
+            __kill_extra_agents
+            if __same_agent; then
+                >&2 echo "[!] Attached to cached ssh-agent"
+                return
+            else
+                __agentdeath
+            fi
+        fi
+    fi
+    __start_agent
+}
+
+
+start_agent
+
+if ! ssh-add -l &>/dev/null; then
+    for key in ${SSH_KEYS[@]}; do
+        ssh-add ~/.ssh/${key}
+    done
+fi
+
+unset pgrep pkill pgrep_out
+# ============= END SSH-AGENT KEEPALIVE =======================================
