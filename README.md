@@ -34,7 +34,7 @@ output like this:
 ```
 Last login: Wed May  3 19:15:41 on ttys079
 [+] Starting ssh agent...
-[!] Saved ssh env at /Users/user/.ssh/env, agent pid
+[!] Saved ssh env at /Users/user/.ssh/env, agent pid 83610
 Enter passphrase for /Users/user/.ssh/id_sys:
 Identity added: /Users/user/.ssh/id_sys (<censored>)
 Enter passphrase for /Users/user/.ssh/id_gitlab:
