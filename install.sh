@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # (c) 2023 github.com/varcharlie
 # Free to use and distribute with no attribution, just don't take all the credit :)
+# TODO:
+# - intelligently find users SSH keys and add the to SSH_KEYS for them
 declare ans=
 declare bp=~/.bash_profile
 declare -r conf=~/.ssh/config
