@@ -13,6 +13,14 @@ proactive killing of all non-managed (non-cached) ssh-agent pids
 
  - Run `./install.sh`, this appends `ssh-agent-keepalive` to the end of your
    ~/.bash_profile.
+ 
+ - Ensure agent forwarding is enabled in your ssh config (~/.ssh/config)
+   ```bash
+   # ~/.ssh/config
+   Host *
+       ForwardAgent yes
+   ```
+   `man 5 ssh-config` for help
 
  - (Optional) Edit ~/.bash_profile to place the ssh-agent-keepalive logic before
    any other operations (such as sourcing bashrc or other files)
