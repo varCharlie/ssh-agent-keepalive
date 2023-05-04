@@ -44,8 +44,8 @@ else
             echo '[!] Enabled agent forwarding, config backed up at '$conf'~'
         else
             >>$conf cat <<-EOF
-				Host *
-				    ForwardAgent yes
+			Host *
+			    ForwardAgent yes
 			EOF
             echo "[!] Added SSH Agent forwarding to $conf"
             echo '[!] Done, SSH-AGENT-KEEPALIVE is enabled'
