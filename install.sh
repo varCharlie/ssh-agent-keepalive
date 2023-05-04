@@ -13,7 +13,7 @@ else
     echo
     echo
     echo "Found config at ~/.ssh/config:"
-    echo "Please ensure to add 'ForwardAgent yes' to all hosts"
+    echo "Please ensure you have 'ForwardAgent yes' on all hosts which use ssh keys for connections!"
     echo
     echo "Example ~/.ssh/config:"
     echo "Host *"
