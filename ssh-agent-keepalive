@@ -39,9 +39,6 @@
 #
 
 
-# (ex: declare -a SSH_KEYS=(id_rsa) if your key is at ~/.ssh/id_rsa)
-# Uncomment the following line and edit to add you SSH keys relative to ~/.ssh
-#declare -a SSH_KEYS=(id_rsa)
 declare SSH_ENV="$HOME/.ssh/env"
 declare pgrep="pgrep -u ${EUID}"
 declare pkill="pkill -u ${EUID}"
@@ -103,7 +100,7 @@ start_agent
 
 if ! ssh-add -l &>/dev/null; then
     for key in ${SSH_KEYS[@]}; do
-        ssh-add ~/.ssh/${key}
+        ssh-add ${key}
     done
 fi
 
