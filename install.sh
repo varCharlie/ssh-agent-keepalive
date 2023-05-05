@@ -5,42 +5,31 @@
 # - intelligently find users SSH keys and add the to SSH_KEYS for them
 declare ans=
 declare bp=~/.bash_profile
-declare errlog=install_errors
 declare -r conf=~/.ssh/config
 declare -a keys=()
 
 handle_dir() {
     if [ $# -eq 1 ]; then
-        # make path relative to homedir
         local dir=$1
+        local ftype=
+        local key=
         for f in $(ls $dir); do
-            local ftype=$(file ${dir}/${f})
+            ftype=$(file ${dir}/${f})
             if test -f ${dir}/$f; then
                 if echo $ftype | grep -qi 'private key'; then
-                    # Private key
-                    echo '[!] Found ssh private key '${dir}/${f}
-                    keys=(${keys[@]} "${dir}/${f}")
+                    key=`echo ${dir}/${f} | sed -E 's/\/(home|Users)\/'$(whoami)'/~/'`
+                    keys=(${keys[*]} ${key})
                 elif echo $ftype | grep -qi 'public key'; then
                     : # public key expected
                 elif echo $ftype | grep -qi 'ascii'; then
                     : # config or environemnt
-                else
-                    # Unexpected filetype
-                    echo "\t$ftype" >> $errlog
                 fi
             elif test -d ${dir}/${f}; then
                 handle_dir ${dir}/${f}
             elif test -S ${dir}/${f}; then
                 : # Found a control socket
-            else
-                # Unknown filetype? skip it
-                echo 'Unknown file type: '${dir}/${f} >> $errlog
-                echo 'Filetype: '`file ${dir}/${f}` >> $errlog
             fi
         done
-    else
-        >>$errlog echo "Error: $BASH_LINENO"
-        >>$errlog echo "handle_dir takes a directory as an argument"
     fi
 }
 
