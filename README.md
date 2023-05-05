@@ -11,17 +11,18 @@ proactively kills off all non-managed (non-cached) ssh-agent pids
  - Run `./install.sh`:
    - The installer will first check for logic in your `.bash_profile` that invokes ssh-agent
      or ssh-add, installer exits if this logic is still present.
-     
-     ```
-     user@host: ~ $ ./install.sh
-     [W] WARNING:
-         You still have logic in your /Users/user/.bash_profile invoking ssh-agent and/or ssh-add
-         Please remove this from your /Users/user/.bash_profile before installing.
 
-     [i] SSH-AGENT-KEEPALIVE works by modifying your /Users/user/.bash_profile to manage ssh-agent
-         and ssh-add by itself
-    ```
-    
+```bash
+user@host: ~ $ ./install.sh
+[W] WARNING:
+    You still have logic in your /Users/user/.bash_profile invoking ssh-agent and/or ssh-add
+    Please remove this from your /Users/user/.bash_profile before installing.
+
+[i] SSH-AGENT-KEEPALIVE works by modifying your /Users/user/.bash_profile to manage ssh-agent
+    and ssh-add by itself
+```
+        
+   
    - The installer will then check your `~/.ssh` directory for private keys and create
      a variable named SSH_KEYS, this variable is placed in your `bash_profile`
      
@@ -29,8 +30,11 @@ proactively kills off all non-managed (non-cached) ssh-agent pids
      while maintaining a backup of your original at `~/.bash_profile~`
      
    - Finally the installer inspects your `~/.ssh/config` to ensure `ForwardAgent` is set to yes
+   
      - If `ForwardAgent` is set to yes then you're done!
+     
      - If `ForwardAgent` is set to no you will be prompted for permission to change it
+     
      - If there is no `ForwardAgent` set then `SSH-AGENT-KEEPALIVE` will either add it under
        `Host *` or add a new config with `ForwardAgent` enabled under `Host *`.
  
