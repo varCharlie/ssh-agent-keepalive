@@ -11,6 +11,7 @@ proactively kills off all non-managed (non-cached) ssh-agent pids
  - Run `./install.sh`:
    - The installer will first check for logic in your `.bash_profile` that invokes ssh-agent
      or ssh-add, installer exits if this logic is still present.
+     
      ```
      user@host: ~ $ ./install.sh
      [W] WARNING:
@@ -20,10 +21,13 @@ proactively kills off all non-managed (non-cached) ssh-agent pids
      [i] SSH-AGENT-KEEPALIVE works by modifying your /Users/user/.bash_profile to manage ssh-agent
          and ssh-add by itself
     ```
+    
    - The installer will then check your `~/.ssh` directory for private keys and create
      a variable named SSH_KEYS, this variable is placed in your `bash_profile`
+     
    - Next the installer copies the contents of `ssh-agent-keepalive` to your `.bash_profile`
      while maintaining a backup of your original at `~/.bash_profile~`
+     
    - Finally the installer inspects your `~/.ssh/config` to ensure `ForwardAgent` is set to yes
      - If `ForwardAgent` is set to yes then you're done!
      - If `ForwardAgent` is set to no you will be prompted for permission to change it
@@ -37,6 +41,7 @@ proactively kills off all non-managed (non-cached) ssh-agent pids
 *Note: Some ssh daemons may forbid you from using a control socket for security reasons.*
 
 An example ssh config has been provided in this repository, it's contents are:
+
 ```
 Host *
     ControlMaster auto
