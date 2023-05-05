@@ -6,7 +6,7 @@ manage a single ssh-agent process through a hashed environment and
 proactively kills off all non-managed (non-cached) ssh-agent pids
 
 ## Install
- - Remove any logic from your ~/.bash_profile that starts ssh-agent or invokes ssh-add
+ - *Remove any logic from your ~/.bash_profile that starts ssh-agent or invokes ssh-add*
  
  - Run `./install.sh`:
    - The installer will first check for logic in your `.bash_profile` that invokes ssh-agent
@@ -15,15 +15,35 @@ proactively kills off all non-managed (non-cached) ssh-agent pids
      a variable named SSH_KEYS, this variable is placed in your `bash_profile`
    - Next the installer copies the contents of `ssh-agent-keepalive` to your `.bash_profile`
      while maintaining a backup of your original at `~/.bash_profile~`
-   - Finally the installer inspects your `~/.ssh/config` to ensure ForwardAgent is set to yes
-     - If ForwardAgent is set to yes then you're done!
-     - If ForwardAgent is set to no you will be prompted for permission to change it
-     - If there is no ForwardAgent set then `SSH-AGENT-KEEPALIVE` will either add it under
-       `Host *` or add a new config with ForwardAgent enabled under `Host *`.
+   - Finally the installer inspects your `~/.ssh/config` to ensure `ForwardAgent` is set to yes
+     - If `ForwardAgent` is set to yes then you're done!
+     - If `ForwardAgent` is set to no you will be prompted for permission to change it
+     - If there is no `ForwardAgent` set then `SSH-AGENT-KEEPALIVE` will either add it under
+       `Host *` or add a new config with `ForwardAgent` enabled under `Host *`.
  
- - Extra Setup: You may consider setting ControlMaster, ControlPath, ControlSocket in your
-   ssh-config (`man 5 ssh-config`) to enable connection multiplexing. This will also improve
-   your SSH experience.
+ - Extra Setup: You may consider enabling connection multiplexing, see below.
+
+
+## Taking SSH further with connection multiplexing via a control socket:
+*Note: Some ssh daemons may forbid you from using a control socket for security reasons.*
+
+An example ssh config has been provided in this repository, it's contents are:
+```
+Host *
+    ControlMaster auto
+    ControlPath ~/.ssh/ctrl-%h
+    ControlPersist 15m
+    ForwardAgent yes
+    IdentityFile ~/.ssh/<SSH_KEY_HERE>
+    User <USERNAME HERE>
+```
+
+This ssh config will setup agent forwarding and connection multiplexing for all SSH hosts,
+using the key provided by IdentityFile. You can leave IdentityFile off and ssh will cycle
+through the keys in your agent... this may count as a failed login attempt and could potentially
+lead to a server lockout if you have multiple other keys in your agent that get tried first.
+
+Refer to `man 5 ssh-config` for help setting up your `ssh-config`.
 
 
 ## Example output:

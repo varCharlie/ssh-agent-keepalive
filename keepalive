@@ -27,14 +27,14 @@
 #
 #   SSH-AGENT KEEPALIVE does the following:
 #     - caches your ssh-agent environment at ~/.ssh/env
-#           (set SSH_ENV to choose a different location)
+#       (set SSH_ENV to choose a different location)
 #     - kills any extra ssh-agent pids that exist for your user
-#     - re-attachs to your ssh-agent when you open a new login
+#     - 're-attachs' to your ssh-agent when you open a new login
+#       by sourcing the agent env into your current env
 #
 #
 #   How to make the most of SSH-AGENT KEEPALIVE?
-#     - Add your keys to the bash array ${SSH_KEYS}
-#     - Configure SSH to forward your agent via ~/.ssh/config
+#     - Configure SSH to use a control socket for connection multiplexing
 #       (`man 5 ssh-config` for more info on how to do that)
 #
 
