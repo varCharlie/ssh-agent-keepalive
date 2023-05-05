@@ -1,8 +1,6 @@
 # SSH-AGENT KEEPALIVE
-
-**SSH-AGENT KEEPALIVE** is a collection of bash functions and commands that
-manage a single ssh-agent process through a cached environment and
-proactively kills off all non-managed (non-cached) ssh-agent pids
+**SSH-AGENT KEEPALIVE** manages ssh-agent for you so that you have access to
+your agent in every terminal session.
 
 
 **Why use SSH-AGENT KEEPALIVE in your ~/.bash_profile?**
