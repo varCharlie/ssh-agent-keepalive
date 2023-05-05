@@ -32,8 +32,8 @@ user@host: ~ $ ./install.sh
    - The installer will then check your `~/.ssh` directory for private keys and create
      a variable named SSH_KEYS, this variable is placed in your `bash_profile`
      
-   - Next the installer copies the contents of `ssh-agent-keepalive` to your `.bash_profile`
-     while maintaining a backup of your original at `~/.bash_profile~`
+   - Next the installer appends the contents of `keepalive` to your `.bash_profile`
+     while maintaining a backup of your original at `~/.bash_profile~`.
      
    - Finally the installer inspects your `~/.ssh/config` to ensure `ForwardAgent` is set to yes
    
