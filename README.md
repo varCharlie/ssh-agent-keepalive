@@ -1,11 +1,19 @@
 # SSH-AGENT KEEPALIVE
 
-
 **SSH-AGENT KEEPALIVE** is a collection of bash functions and commands that
 manage a single ssh-agent process through a hashed environment and
 proactively kills off all non-managed (non-cached) ssh-agent pids
 
-## Install
+
+**Why use SSH-AGENT KEEPALIVE in your ~/.bash_profile?**
+  1. Because ssh-agent makes your life easier
+  2. Many terminal emulators (terminal and iterm on MacOS) open a new
+     login shell for each tab/window. Each login invokes ~/.bash_profile
+  3. Having a single ssh-agent running with a cached environment will allow
+     you to use the same ssh-agent in all windows, tabs, tmux sessions, tmux
+     windows, tmux panes etc...
+
+# Install
  - *Remove any logic from your ~/.bash_profile that starts ssh-agent or invokes ssh-add*
  
  - Run `./install.sh`:
