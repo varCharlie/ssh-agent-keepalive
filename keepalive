@@ -62,9 +62,9 @@ function __same_agent {
 function __start_agent {
     >&2 echo "[+] Starting ssh agent..."
     ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-    >&2 echo "[!] Saved ssh env at ${SSH_ENV}, agent pid ${SSH_AGENT_PID}"
     chmod 600 "${SSH_ENV}"
     source ${SSH_ENV}
+    >&2 echo "[!] Saved ssh env at ${SSH_ENV}, agent pid ${SSH_AGENT_PID}"
 }
 
 function __kill_extra_agents {
@@ -106,3 +106,4 @@ fi
 
 unset pgrep pkill pgrep_out
 # ============= END SSH-AGENT KEEPALIVE =======================================
+
