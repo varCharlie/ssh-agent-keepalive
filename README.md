@@ -1,9 +1,9 @@
 # SSH-AGENT KEEPALIVE
-**SSH-AGENT KEEPALIVE** manages ssh-agent for you so that you have access to
+`SSH-AGENT KEEPALIVE` manages ssh-agent for you so that you have access to
 your agent in every terminal session.
 
 
-**Why use SSH-AGENT KEEPALIVE in your ~/.bash_profile?**
+**Why use `SSH-AGENT KEEPALIVE` in your ~/.bash_profile?**
   1. Because ssh-agent makes your life easier
   2. Many terminal emulators (terminal and iterm on MacOS) open a new
      login shell for each tab/window. Each login invokes ~/.bash_profile
