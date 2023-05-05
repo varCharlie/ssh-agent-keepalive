@@ -1,0 +1,7 @@
+Host *
+    ControlMaster auto
+    ControlPath ~/.ssh/ctrl-%h
+    ControlPersist 15m
+    ForwardAgent yes
+    IdentityFile ~/.ssh/<SSH_KEY_HERE>
+    User <USERNAME HERE>
