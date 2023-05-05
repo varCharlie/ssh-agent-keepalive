@@ -10,7 +10,16 @@ proactively kills off all non-managed (non-cached) ssh-agent pids
  
  - Run `./install.sh`:
    - The installer will first check for logic in your `.bash_profile` that invokes ssh-agent
-     or ssh-add, installer exits if this logic is still present. Please remove it
+     or ssh-add, installer exits if this logic is still present.
+     ```
+     user@host: ~ $ ./install.sh
+     [W] WARNING:
+         You still have logic in your /Users/user/.bash_profile invoking ssh-agent and/or ssh-add
+         Please remove this from your /Users/user/.bash_profile before installing.
+
+     [i] SSH-AGENT-KEEPALIVE works by modifying your /Users/user/.bash_profile to manage ssh-agent
+         and ssh-add by itself
+    ```
    - The installer will then check your `~/.ssh` directory for private keys and create
      a variable named SSH_KEYS, this variable is placed in your `bash_profile`
    - Next the installer copies the contents of `ssh-agent-keepalive` to your `.bash_profile`
