@@ -67,7 +67,7 @@ using the key provided by IdentityFile. You can leave IdentityFile off and ssh w
 through the keys in your agent... this may count as a failed login attempt and could potentially
 lead to a server lockout if you have multiple other keys in your agent that get tried first.
 
-Refer to `man 5 ssh-config` for help setting up your `ssh-config`.
+Refer to `man 5 ssh_config` for help setting up your `ssh_config`.
 
 
 ## Example output:

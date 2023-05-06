@@ -1,3 +1,4 @@
+# Wildcard:
 Host *
     ControlMaster auto
     ControlPath ~/.ssh/ctrl-%h
