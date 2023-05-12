@@ -4,12 +4,12 @@ your agent in every terminal session.
 
 
 **Why use `SSH-AGENT KEEPALIVE` in your ~/.bash_profile?**
-  1. Because ssh-agent makes your life easier
-  2. Many terminal emulators (terminal and iterm on MacOS) open a new
-     login shell for each tab/window. Each login invokes ~/.bash_profile
-  3. Having a single ssh-agent running with a cached environment will allow
-     you to use the same ssh-agent in all windows, tabs, tmux sessions, tmux
-     windows, tmux panes etc...
+  1. Because ssh-agent makes your remote access life easier
+  2. Alternative is to source your agent environment manually or source it directly from
+     your ~/.bash_profile but what happens when that pid dies and the cache lives?
+  3. You can write your own logic to see if the pid is still there but occasionally you'll find
+     that you have more than one ssh-agent process running for your user which is wasting
+     resources. I've considered those things and accounted for them. 
 
 # Setup
  - *Remove any logic from your ~/.bash_profile that starts ssh-agent or invokes ssh-add*
@@ -18,8 +18,8 @@ your agent in every terminal session.
    - The setup will first check for logic in your `.bash_profile` that invokes ssh-agent
      or ssh-add, setup exits if this logic is still present.
 
-```bash
-user@host: ~ $ ./setup.sh
+```
+user@host:~/ssh-agent-keepalive$ ./setup.sh
 [W] WARNING:
     You still have logic in your /Users/user/.bash_profile invoking ssh-agent and/or ssh-add
     Please remove this from your /Users/user/.bash_profile before setup.
@@ -27,28 +27,28 @@ user@host: ~ $ ./setup.sh
 [i] SSH-AGENT-KEEPALIVE works by modifying your /Users/user/.bash_profile to manage ssh-agent
     and ssh-add by itself
 ```
-        
    
    - The setup will then check your `~/.ssh` directory for private keys and create
-     a variable named SSH_KEYS, this variable is placed in your `bash_profile`
+     a variable named `$SSH_KEYS`, this variable is placed in your `bash_profile`
      
    - Next the setup appends the contents of `keepalive` to your `.bash_profile`
      while maintaining a backup of your original at `~/.bash_profile~`.
      
-   - Finally the setup inspects your `~/.ssh/config` to ensure `ForwardAgent` is set to yes
+   - Finally the setup permissively alters your `~/.ssh/config` ensuring `ForwardAgent`
+     is set to yes.
    
-     - If `ForwardAgent` is set to yes then you're done!
+     - If `ForwardAgent` is set to yes then you're ready to go.
      
      - If `ForwardAgent` is set to no you will be prompted for permission to change it
      
      - If there is no `ForwardAgent` set then `SSH-AGENT-KEEPALIVE` will either add it under
        `Host *` or add a new config with `ForwardAgent` enabled under `Host *`.
  
- - Extra Setup: You may consider enabling connection multiplexing, see below.
+ - Extra Setup: You may consider enabling connection multiplexing, see `ssh_config_example`.
 
 
-## Taking SSH further with connection multiplexing via a control socket:
-*Note: Some ssh daemons may forbid you from using a control socket for security reasons.*
+## Taking SSH lazyness further with connection multiplexing via a control socket:
+*Note: Some ssh servers may disable the use of a control socket for security reasons.*
 
 An example ssh config has been provided in this repository, it's contents are:
 
@@ -62,8 +62,8 @@ Host *
     User <USERNAME HERE>
 ```
 
-This ssh config will setup agent forwarding and connection multiplexing for all SSH hosts,
-using the key provided by IdentityFile. You can leave IdentityFile off and ssh will cycle
+This `ssh_config` will setup agent forwarding and connection multiplexing for all SSH hosts,
+using the key provided by `IdentityFile`. You can leave `IdentityFile` off and ssh will cycle
 through the keys in your agent... this may count as a failed login attempt and could potentially
 lead to a server lockout if you have multiple other keys in your agent that get tried first.
 
@@ -79,12 +79,12 @@ output like this:
 Last login: Wed May  3 19:15:41 on ttys079
 [+] Starting ssh agent...
 [!] Saved ssh env at /Users/user/.ssh/env, agent pid 83610
-Enter passphrase for /Users/user/.ssh/id_sys:
-Identity added: /Users/user/.ssh/id_sys (<censored>)
-Enter passphrase for /Users/user/.ssh/id_gitlab:
-Identity added: /Users/user/.ssh/id_gitlab (<censored>)
-Enter passphrase for /Users/user/.ssh/varcharlie_github/id_varcharlie:
-Identity added: /Users/user/.ssh/varcharlie_github/id_varcharlie (<censored>)
+Enter passphrase for /Users/user/.ssh/priv1:
+Identity added: /Users/user/.ssh/priv1 (<censored>)
+Enter passphrase for /Users/user/.ssh/priv2:
+Identity added: /Users/user/.ssh/priv2 (<censored>)
+Enter passphrase for /Users/user/.ssh/github/priv3:
+Identity added: /Users/user/.ssh/github/priv3 (<censored>)
 
 username@hostname: ~ $
 ```
