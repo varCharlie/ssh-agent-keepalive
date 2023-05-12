@@ -11,31 +11,31 @@ your agent in every terminal session.
      you to use the same ssh-agent in all windows, tabs, tmux sessions, tmux
      windows, tmux panes etc...
 
-# Install
+# Setup
  - *Remove any logic from your ~/.bash_profile that starts ssh-agent or invokes ssh-add*
  
- - Run `./install.sh`:
-   - The installer will first check for logic in your `.bash_profile` that invokes ssh-agent
-     or ssh-add, installer exits if this logic is still present.
+ - Run `./setup.sh`:
+   - The setup will first check for logic in your `.bash_profile` that invokes ssh-agent
+     or ssh-add, setup exits if this logic is still present.
 
 ```bash
-user@host: ~ $ ./install.sh
+user@host: ~ $ ./setup.sh
 [W] WARNING:
     You still have logic in your /Users/user/.bash_profile invoking ssh-agent and/or ssh-add
-    Please remove this from your /Users/user/.bash_profile before installing.
+    Please remove this from your /Users/user/.bash_profile before setup.
 
 [i] SSH-AGENT-KEEPALIVE works by modifying your /Users/user/.bash_profile to manage ssh-agent
     and ssh-add by itself
 ```
         
    
-   - The installer will then check your `~/.ssh` directory for private keys and create
+   - The setup will then check your `~/.ssh` directory for private keys and create
      a variable named SSH_KEYS, this variable is placed in your `bash_profile`
      
-   - Next the installer appends the contents of `keepalive` to your `.bash_profile`
+   - Next the setup appends the contents of `keepalive` to your `.bash_profile`
      while maintaining a backup of your original at `~/.bash_profile~`.
      
-   - Finally the installer inspects your `~/.ssh/config` to ensure `ForwardAgent` is set to yes
+   - Finally the setup inspects your `~/.ssh/config` to ensure `ForwardAgent` is set to yes
    
      - If `ForwardAgent` is set to yes then you're done!
      
