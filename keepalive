@@ -24,9 +24,6 @@ if [[ $- == *i* ]]
 then
 
   declare SSH_ENV="$HOME/.ssh/env"
-  declare pgrep="pgrep -u ${EUID}"
-  declare pkill="pkill -u ${EUID}"
-  declare pgrep_out=`$pgrep ssh-agent 2>/dev/null | tr '\n' ' '`
 
   function __agentdeath {
       $pkill ssh-agent
@@ -61,6 +58,9 @@ then
   }
 
   function start_agent {
+      declare pgrep="pgrep -u ${EUID}"
+      declare pkill="pkill -u ${EUID}"
+      declare pgrep_out=`$pgrep ssh-agent 2>/dev/null | tr '\n' ' '`
       if [ "${pgrep_out:-x}" != "x" ]; then
           >&2 echo "[!] Found running ssh-agent(s)..."
           if test -s "${SSH_ENV}"; then
