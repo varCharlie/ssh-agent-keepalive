@@ -76,6 +76,7 @@ then
           fi
       fi
       __start_agent
+      unset pgrep pkill pgrep_out
   }
 
   function attach_agent {
@@ -92,7 +93,6 @@ then
 
   alias start-agent=start_agent
   alias attach-agent=attach_agent
-  unset pgrep pkill pgrep_out
 
 fi
 # ============ END SSH-AGENT KEEPALIVE =====================================
