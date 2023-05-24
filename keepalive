@@ -15,73 +15,84 @@
 #  ██║  ██╗███████╗███████╗██║     ██║  ██║███████╗██║ ╚████╔╝ ███████╗
 #  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝  ╚══════╝
 #
-#=============================================================================
+#  Use "attach-agent" to attach keepalive agent in pre-existing terminal
+#  windows after setup
+#
+#============================================================================
 
-declare SSH_ENV="$HOME/.ssh/env"
-declare pgrep="pgrep -u ${EUID}"
-declare pkill="pkill -u ${EUID}"
-declare pgrep_out=`$pgrep ssh-agent 2>/dev/null | tr '\n' ' '`
+if [[ $- == *i* ]]
+then
 
+  declare SSH_ENV="$HOME/.ssh/env"
+  declare pgrep="pgrep -u ${EUID}"
+  declare pkill="pkill -u ${EUID}"
+  declare pgrep_out=`$pgrep ssh-agent 2>/dev/null | tr '\n' ' '`
 
-function __agentdeath {
-    $pkill ssh-agent
-    >&2 echo '[X] Killed all ssh-agents...'
-    test -e ${SSH_ENV} && rm ${SSH_ENV}
-}
+  function __agentdeath {
+      $pkill ssh-agent
+      >&2 echo '[X] Killed all ssh-agents...'
+      test -e ${SSH_ENV} && rm ${SSH_ENV}
+  }
 
-function __same_agent {
-    if echo $pgrep_out | grep -qE "^${SSH_AGENT_PID}$"; then
-        return 0
-    else
-        return 1
-    fi
-}
+  function __same_agent {
+      if echo $pgrep_out | grep -qE "^${SSH_AGENT_PID}$"; then
+          return 0
+      else
+          return 1
+      fi
+  }
 
-function __start_agent {
-    >&2 echo "[+] Starting ssh agent..."
-    ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-    chmod 600 "${SSH_ENV}"
-    source ${SSH_ENV}
-    >&2 echo "[!] Saved ssh env at ${SSH_ENV}, agent pid ${SSH_AGENT_PID}"
-}
+  function __start_agent {
+      >&2 echo "[+] Starting ssh agent..."
+      ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+      chmod 600 "${SSH_ENV}"
+      source ${SSH_ENV}
+      >&2 echo "[!] Saved ssh env at ${SSH_ENV}, agent pid ${SSH_AGENT_PID}"
+  }
 
-function __kill_extra_agents {
-    for pid in `echo $pgrep_out`; do
-        if [ ${SSH_AGENT_PID} -ne ${pid} ]; then
-            kill -9 $pid && \
-            >&2 echo "[X] Killed stale ssh-agent with pid ${pid}"
-            pgrep_out=${pgrep_out/$pid/}
-        fi
-    done
-}
+  function __kill_extra_agents {
+      for pid in `echo $pgrep_out`; do
+          if [ ${SSH_AGENT_PID} -ne ${pid} ]; then
+              kill -9 $pid && \
+              >&2 echo "[X] Killed stale ssh-agent with pid ${pid}"
+              pgrep_out=${pgrep_out/$pid/}
+          fi
+      done
+  }
 
-function start_agent {
-    if [ "${pgrep_out:-x}" != "x" ]; then
-        >&2 echo "[!] Found running ssh-agent(s)..."
-        if test -s "${SSH_ENV}"; then
-            >&2 echo "[!] Found cached ssh-agent env, sourcing..."
-            source "${SSH_ENV}"
-            __kill_extra_agents
-            if __same_agent; then
-                >&2 echo "[!] Attached to cached ssh-agent"
-                return
-            else
-                __agentdeath
-            fi
-        fi
-    fi
-    __start_agent
-}
+  function start_agent {
+      if [ "${pgrep_out:-x}" != "x" ]; then
+          >&2 echo "[!] Found running ssh-agent(s)..."
+          if test -s "${SSH_ENV}"; then
+              >&2 echo "[!] Found cached ssh-agent env, sourcing..."
+              source "${SSH_ENV}"
+              __kill_extra_agents
+              if __same_agent; then
+                  >&2 echo "[!] Attached to cached ssh-agent"
+                  return
+              else
+                  __agentdeath
+              fi
+          fi
+      fi
+      __start_agent
+  }
 
+  function attach_agent {
+      test -s ${SSH_ENV} && source ${SSH_ENV}
+  }
 
-start_agent
+  start_agent
 
-if ! ssh-add -l &>/dev/null; then
-    for key in ${SSH_KEYS[@]}; do
-        ssh-add ${key}
-    done
+  if ! ssh-add -l &>/dev/null; then
+      for key in ${SSH_KEYS[@]}; do
+          ssh-add ${key}
+      done
+  fi
+
+  alias start-agent=start_agent
+  alias attach-agent=attach_agent
+  unset pgrep pkill pgrep_out
+
 fi
-
-unset pgrep pkill pgrep_out
-# ============= END SSH-AGENT KEEPALIVE =======================================
-
+# ============ END SSH-AGENT KEEPALIVE =====================================
