@@ -8,7 +8,7 @@ declare bp=~/.bash_profile
 declare -r conf=~/.ssh/config
 declare -a keys=()
 
-handle_dir() {
+find_keys() {
     if [ $# -eq 1 ]; then
         local dir=$1
         local ftype=
@@ -25,7 +25,7 @@ handle_dir() {
                     : # config or environemnt
                 fi
             elif test -d ${dir}/${f}; then
-                handle_dir ${dir}/${f}
+                find_keys ${dir}/${f}
             elif test -S ${dir}/${f}; then
                 : # Found a control socket
             fi
@@ -50,7 +50,7 @@ fi
 cp $bp ${bp}~
 
 # setup ssh key additions;
-handle_dir ~/.ssh
+find_keys ~/.ssh
 declare declare_stmt="declare -a SSH_KEYS=(${keys[@]})"
 
 # modify bash profile;
