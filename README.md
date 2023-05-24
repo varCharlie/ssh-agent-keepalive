@@ -2,8 +2,16 @@
 `SSH-AGENT KEEPALIVE` manages ssh-agent for you so that you have access to
 your agent in every terminal session.
 
+## TL;DR Quick Setup & Usage Instructions
+#### Setup
+- Setup `SSH-AGENT-KEEPALIVE` by running `setup.sh`.
+- Attach to the SSH-agent in old terminal windows by running `source ~/.ssh/env`.
+  Alternatively you can `source ~/.bash_profile` which will attach to your newly
+  spawned SSH-Agent.
+- See **Example flow of a first time setup** below for detailed output
 
-**Why use `SSH-AGENT KEEPALIVE` in your ~/.bash_profile?**
+
+## Why use `SSH-AGENT KEEPALIVE`?
   1. Because ssh-agent makes your remote access life easier
   2. Alternative is to source your agent environment manually or source it directly from
      your ~/.bash_profile but what happens when that pid dies and the cache lives?
@@ -11,46 +19,26 @@ your agent in every terminal session.
      that you have more than one ssh-agent process running for your user which is wasting
      resources. I've considered those things and accounted for them. 
 
-# Setup
- - *Remove any logic from your ~/.bash_profile that starts ssh-agent or invokes ssh-add*
- 
- - Run `./setup.sh`:
-   - The setup will first check for logic in your `.bash_profile` that invokes ssh-agent
-     or ssh-add, setup exits if this logic is still present.
+## Setup
+- **IMPORTANT** Remove any logic from your `~/.bash_profile` that starts `ssh-agent` or invokes `ssh-add`
+- Run `./setup.sh` which takes the following actions.
+ - Verifies `~/.bash_profile` doesn't directly invoke `ssh-agent` or `ssh-add`
+ - Backs up `~/.bash_profile` to `~/.bash_profile~`
+ - Adds all private keys found in `~/.ssh` to a variable named `SSH_KEYS`
+ - Updates your `~/.bash_profile` to install itself
+ - Checks if `~/.ssh/config` exists
+  - If so it checks if `ForwardAgent` is set to `no` then asks for permission to change this.
+    You should only deny permission if you *purposely* don't want agent forwarding for that host.
+  - If not it creates a basic `ssh_config` with `ForwardAgent yes` configured for wildcard `Host *`
 
-```
-user@host:~/ssh-agent-keepalive$ ./setup.sh
-[W] WARNING:
-    You still have logic in your /Users/user/.bash_profile invoking ssh-agent and/or ssh-add
-    Please remove this from your /Users/user/.bash_profile before setup.
+Additonal considerations:
+- For supreme laziness you may want to consider using connection multiplexing.
+  "would ya look at that?"- This is disabled on some SSH servers due to "security concerns"
+  ^-(as Ed Bassmaster)--^
 
-[i] SSH-AGENT-KEEPALIVE works by modifying your /Users/user/.bash_profile to manage ssh-agent
-    and ssh-add by itself
-```
-   
-   - The setup will then check your `~/.ssh` directory for private keys and create
-     a variable named `$SSH_KEYS`, this variable is placed in your `bash_profile`
-     
-   - Next the setup appends the contents of `keepalive` to your `.bash_profile`
-     while maintaining a backup of your original at `~/.bash_profile~`.
-     
-   - Finally the setup permissively alters your `~/.ssh/config` ensuring `ForwardAgent`
-     is set to yes.
-   
-     - If `ForwardAgent` is set to yes then you're ready to go.
-     
-     - If `ForwardAgent` is set to no you will be prompted for permission to change it
-     
-     - If there is no `ForwardAgent` set then `SSH-AGENT-KEEPALIVE` will either add it under
-       `Host *` or add a new config with `ForwardAgent` enabled under `Host *`.
- 
- - Extra Setup: You may consider enabling connection multiplexing, see `ssh_config_example`.
-
-
-## Taking SSH lazyness further with connection multiplexing via a control socket:
-*Note: Some ssh servers may disable the use of a control socket for security reasons.*
-
-An example ssh config has been provided in this repository, it's contents are:
+### SSH Connection Multiplexing via Control Sockets
+I've provided an example `ssh_config` in this directory that implements connection multiplexing.
+It uses multiplexing based on hostname and persists for 15 minutes after you log out.
 
 ```
 Host *
@@ -62,19 +50,33 @@ Host *
     User <USERNAME HERE>
 ```
 
-This `ssh_config` will setup agent forwarding and connection multiplexing for all SSH hosts,
-using the key provided by `IdentityFile`. You can leave `IdentityFile` off and ssh will cycle
-through the keys in your agent... this may count as a failed login attempt and could potentially
-lead to a server lockout if you have multiple other keys in your agent that get tried first.
-
 Refer to `man 5 ssh_config` for help setting up your `ssh_config`.
 
+### Example flow of a first time setup
+```
+# Example output, first try failed:
+user@host:~/git/ssh-agent-keepalive$ ./setup.sh
+[W] WARNING:
+    You still have logic in your /Users/user/.bash_profile invoking ssh-agent and/or ssh-add
+    Please remove this from your /Users/user/.bash_profile before installing.
 
-## Example output:
+[i] SSH-AGENT-KEEPALIVE works by modifying your /Users/user/.bash_profile to manage ssh-agent
+    and ssh-add by itself
+```
 
-If you've set it up properly and open a new terminal window you should see
-output like this:
+```
+user@host:~/git/ssh-agent-keepalive$ vim ~/.bash_profile # Removing ssh-agent and ssh-add invocations
+```
 
+```
+user@host:~/git/ssh-agent-keepalive$ ./setup.sh
+[!] Ran `echo declare -a SSH_KEYS=(~/.ssh/id_ed25519 ~/.ssh/id_rsa) >> /Users/user/.bash_profile`
+[!] Ran `tail -n +2 keepalive >> /Users/user/.bash_profile`
+[i] You have agent forwarding enabled!
+[!] Done, SSH-AGENT-KEEPALIVE is enabled
+```
+
+### Example output
 ```
 Last login: Wed May  3 19:15:41 on ttys079
 [+] Starting ssh agent...
@@ -85,27 +87,14 @@ Enter passphrase for /Users/user/.ssh/priv2:
 Identity added: /Users/user/.ssh/priv2 (<censored>)
 Enter passphrase for /Users/user/.ssh/github/priv3:
 Identity added: /Users/user/.ssh/github/priv3 (<censored>)
-
-username@hostname: ~ $
 ```
-
-Congrats! It's working and you've successfully added your keys!
-
-If your ssh keys don't have a password attached to them the will be added with
-no user prompting.
-
-Opening more new windows might look something like this:
 
 ```
 Last login: Wed May  3 19:15:45 on ttys080
 [!] Found running ssh-agent(s)...
 [!] Found cached ssh-agent env, sourcing...
 [!] Attached to cached ssh-agent
-
-username@hostname: ~ $
 ```
-
-However if you had multiple ssh-agents running you might see something like this:
 
 ```
 Last login: Wed May  3 19:18:20 on ttys081
@@ -116,10 +105,4 @@ Last login: Wed May  3 19:18:20 on ttys081
 [X] Killed stale ssh-agent with pid 71878
 [X] Killed stale ssh-agent with pid 71880
 [!] Attached to cached ssh-agent
-
-$ user on cpantoga in ~
-07:18:20 ❯❯
 ```
-
-You shouldn't expect to see any stale pids killed on the first login shell after installation
-since `SSH-AGENT-KEEPALIVE` will kill all agents and start a new one if an env cache is not found.
