@@ -68,7 +68,7 @@ tail -n +2 keepalive >> $bp && echo '[!] Ran `tail -n +2 keepalive >> '${bp}'`'
 
 # modify ssh config;
 prompt() {
-    read -p '[?] Would you like to enable ForwardAgent in all instances? (y/n) ' ans
+    read -p "[?] Would you like to enable ForwardAgent for all hosts in ${conf}? (y/n) " ans
 }
 
 if ! test -e $conf; then
@@ -88,17 +88,16 @@ else
         prompt
         case $ans in
             y) sed -i '~' 's/ForwardAgent no/ForwardAgent yes/' $conf && \
-               echo '[!] Config backed up at '$conf'~'
-               echo '[!] Done, SSH-AGENT KEEPALIVE is enabled';;
-            *) echo '[:(] Sorry, SSH-AGENT-KEEPALIVE might not work as expected...';;
+               echo '[!] Config backed up at '$conf'~';;
+            *) echo '[:(] Sorry, SSH-AGENT-KEEPALIVE might not work as expected...';
+               exit;;
         esac
     elif grep -q 'ForwardAgent yes' $conf; then
         echo '[i] You have agent forwarding enabled!'
-        echo '[!] Done, SSH-AGENT-KEEPALIVE is enabled'
     else
         echo '[!] You have an ssh config that does not have ForwardAgent enabled!'
         if grep 'Host *' $conf; then
-            sed -i '~' 's/Host \*/Host *\n\tForwardAgent yes/' $conf
+            sed -i '~' 's/Host \*/Host *\n\tForwardAgent yes/' $conf && \
             echo '[!] Enabled agent forwarding, config backed up at '$conf'~'
         else
             {
@@ -106,8 +105,8 @@ else
 				Host *
 				    ForwardAgent yes
 				EOF
-            } && echo "[!] Added SSH Agent forwarding to $conf" && \
-                 echo '[!] Done, SSH-AGENT-KEEPALIVE is enabled'
+            } && echo "[!] Added SSH Agent forwarding to $conf"
         fi
     fi
 fi
+echo '[!] Done, SSH-AGENT-KEEPALIVE is enabled'
