@@ -51,7 +51,7 @@ cp $bp ${bp}~
 
 # setup ssh key additions;
 find_keys ~/.ssh
-declare declare_stmt="declare -a SSH_KEYS=(${keys[@]})"
+declare keys_array="declare -a SSH_KEYS=(${keys[@]})"
 
 # modify bash profile;
 >>$bp cat<<-EOF
@@ -62,7 +62,7 @@ declare declare_stmt="declare -a SSH_KEYS=(${keys[@]})"
 		#
 		# vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 		EOF
-echo $declare_stmt >> $bp && echo '[!] Ran `echo '${declare_stmt}' >> '${bp}'`'
+echo $keys_array >> $bp && echo '[!] Ran `echo '${keys_array}' >> '${bp}'`'
 tail -n +2 keepalive >> $bp && echo '[!] Ran `tail -n +2 keepalive >> '${bp}'`'
 
 
