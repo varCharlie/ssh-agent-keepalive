@@ -92,7 +92,6 @@ else
                echo '[!] Done, SSH-AGENT KEEPALIVE is enabled';;
             *) echo '[:(] Sorry, SSH-AGENT-KEEPALIVE might not work as expected...';;
         esac
-        set +x
     elif grep -q 'ForwardAgent yes' $conf; then
         echo '[i] You have agent forwarding enabled!'
         echo '[!] Done, SSH-AGENT-KEEPALIVE is enabled'
