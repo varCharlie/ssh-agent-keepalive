@@ -1,15 +1,31 @@
+███████╗███████╗██╗  ██╗       █████╗  ██████╗ ███████╗███╗   ██╗████████╗
+██╔════╝██╔════╝██║  ██║      ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝
+███████╗███████╗███████║█████╗███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║
+╚════██║╚════██║██╔══██║╚════╝██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║
+███████║███████║██║  ██║      ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║
+╚══════╝╚══════╝╚═╝  ╚═╝      ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝
+
+██╗  ██╗███████╗███████╗██████╗  █████╗ ██╗     ██╗██╗   ██╗███████╗
+██║ ██╔╝██╔════╝██╔════╝██╔══██╗██╔══██╗██║     ██║██║   ██║██╔════╝
+█████╔╝ █████╗  █████╗  ██████╔╝███████║██║     ██║██║   ██║█████╗
+██╔═██╗ ██╔══╝  ██╔══╝  ██╔═══╝ ██╔══██║██║     ██║╚██╗ ██╔╝██╔══╝
+██║  ██╗███████╗███████╗██║     ██║  ██║███████╗██║ ╚████╔╝ ███████╗
+╚═╝  ╚═╝╚══════╝╚══════╝╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝  ╚══════╝
+
+-------
 # SSH-AGENT KEEPALIVE
 `SSH-AGENT KEEPALIVE` manages ssh-agent for you so that you have access to
 your agent in every terminal session.
 
-## TL;DR Quick Setup & Usage Instructions
-#### Setup
+## TL;DR
+#### Quick Setup
 - Setup `SSH-AGENT-KEEPALIVE` by running `setup.sh`.
 - Attach to the SSH-agent in old terminal windows by running `source ~/.ssh/env`.
   Alternatively you can `source ~/.bash_profile` which will attach to your newly
   spawned SSH-Agent.
 - See **Example flow of a first time setup** below for detailed output
 
+---
 
 ## Why use `SSH-AGENT KEEPALIVE`?
   1. Because ssh-agent makes your remote access life easier
