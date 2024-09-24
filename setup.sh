@@ -15,18 +15,19 @@ find_keys() {
         local key=
         for f in $(ls $dir); do
             ftype=$(file ${dir}/${f})
-            if test -f ${dir}/$f; then
+            local real_f=${dir}/${f}
+            if test -f ${real_f}; then
                 if echo $ftype | grep -qi 'private key'; then
-                    key=`echo ${dir}/${f} | sed -E 's/\/(home|Users)\/'$(whoami)'/~/'`
+                    key=`echo ${real_f} | sed -E 's/\/(home|Users)\/'$(whoami)'/~/'`
                     keys=(${keys[*]} ${key})
                 elif echo $ftype | grep -qi 'public key'; then
                     : # public key expected
                 elif echo $ftype | grep -qi 'ascii'; then
                     : # config or environemnt
                 fi
-            elif test -d ${dir}/${f}; then
-                find_keys ${dir}/${f}
-            elif test -S ${dir}/${f}; then
+            elif test -d ${real_f}; then
+                find_keys ${real_f};
+            elif test -S ${real_f}; then
                 : # Found a control socket
             fi
         done
