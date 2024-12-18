@@ -10,7 +10,7 @@ then                # Only in an interactive shell:
   declare SSH_ENV="$HOME/.ssh/env"
 
   function __agentdeath {
-      $pkill ssh-agent
+      pkill -u ${EUID} ssh-agent
       >&2 echo '[X] Killed all ssh-agents...'
       test -e ${SSH_ENV} && rm ${SSH_ENV}
   }
@@ -42,9 +42,7 @@ then                # Only in an interactive shell:
   }
 
   function start_agent {
-      declare pgrep="pgrep -u ${EUID}"
-      declare pkill="pkill -u ${EUID}"
-      declare pgrep_out=`$pgrep ssh-agent 2>/dev/null | tr '\n' ' '`
+      declare pgrep_out=`pgrep -u ${EUID} ssh-agent 2>/dev/null | tr '\n' ' '`
       if [ "${pgrep_out:-x}" != "x" ]; then
           >&2 echo "[!] Found running ssh-agent(s)..."
           if test -s "${SSH_ENV}"; then
@@ -60,7 +58,7 @@ then                # Only in an interactive shell:
           fi
       fi
       __start_agent
-      unset pgrep pkill pgrep_out
+      unset pgrep_out
   }
 
   function attach_agent {
