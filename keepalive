@@ -42,6 +42,7 @@ then                # Only in an interactive shell:
   }
 
   function start_agent {
+      # pgrep out is NOT a local variable, it must outlive invocation of this func
       declare pgrep_out=`pgrep -u ${EUID} ssh-agent 2>/dev/null | tr '\n' ' '`
       if [ "${pgrep_out:-x}" != "x" ]; then
           >&2 echo "[!] Found running ssh-agent(s)..."
