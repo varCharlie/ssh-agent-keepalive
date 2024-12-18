@@ -2,7 +2,6 @@
 # ============= BEGIN SSH-AGENT KEEPALIVE ===================================
 # Functions:
 #  attach_agent -- if your environment variables get "lost"
-#  start_agent -- start ssh agent
 #----------------------------------------------------------------------------
 if [[ $- == *i* ]]
 then                # Only in an interactive shell:
