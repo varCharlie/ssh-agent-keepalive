@@ -13,7 +13,7 @@ find_keys() {
         local dir=$1
         local ftype=
         local key=
-        for f in $(ls $dir); do
+        for f in ${dir}/*; do
             ftype=$(file ${dir}/${f})
             local real_f=${dir}/${f}
             if test -f ${real_f}; then
